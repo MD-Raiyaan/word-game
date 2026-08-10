@@ -8,8 +8,8 @@ from app import create_app, db
 from app.models import User
 
 def seed_admin():
-    admin_username = os.environ.get('ADMIN_USERNAME', 'admin$123')
-    admin_password = os.environ.get('ADMIN_PASSWORD', 'Admin@123')
+    admin_username = os.environ.get('ADMIN_USERNAME', 'Admin$01')
+    admin_password = os.environ.get('ADMIN_PASSWORD', 'Admin$123')
 
     app = create_app()
     with app.app_context():
