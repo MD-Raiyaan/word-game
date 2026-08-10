@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Report - Admin - Guess the Word{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <a href="{{ url_for('admin.dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
+        <h1>Daily Activity Report</h1>
+        <p class="admin-subtitle">Inspect player activity and won games for a selected date</p>
+    </div>
+
+    <form method="GET" action="{{ url_for('admin.daily_report') }}" class="filter-form">
+        <div class="form-inline-group">
+            <label for="dateSelect">Select Date:</label>
+            <input
+                type="date"
+                id="dateSelect"
+                name="date"
+                value="{{ selected_date }}"
+                onchange="this.form.submit()"
+            >
+            <button type="submit" class="btn-primary-sm">Filter Date</button>
+        </div>
+    </form>
+
+    <div class="report-summary-cards">
+        <div class="summary-card">
+            <div class="summary-value">{{ distinct_users_count }}</div>
+            <div class="summary-label">Distinct Players Active on {{ selected_date }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-value text-success">{{ correct_guesses_count }}</div>
+            <div class="summary-label">Correct Guesses (Games Won) on {{ selected_date }}</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-value">{{ games_started_count }}</div>
+            <div class="summary-label">Total Games Started on {{ selected_date }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

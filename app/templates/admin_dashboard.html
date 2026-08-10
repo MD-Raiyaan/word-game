@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Guess the Word{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Admin Control Panel</h1>
+        <p class="admin-subtitle">System metrics and analytics reporting</p>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon">👥</div>
+            <div class="metric-value">{{ total_users }}</div>
+            <div class="metric-label">Registered Players</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">🎮</div>
+            <div class="metric-value">{{ total_games }}</div>
+            <div class="metric-label">Total Games Played</div>
+        </div>
+    </div>
+
+    <div class="admin-nav-cards">
+        <a href="{{ url_for('admin.daily_report') }}" class="nav-card">
+            <div class="card-icon">📅</div>
+            <h3>Daily Report</h3>
+            <p>Inspect active player counts and correct guesses for any selectable date.</p>
+            <span class="card-link">View Daily Report &rarr;</span>
+        </a>
+
+        <a href="{{ url_for('admin.user_report') }}" class="nav-card">
+            <div class="card-icon">👤</div>
+            <h3>User Activity Report</h3>
+            <p>Select any player to inspect their per-date games played and games won.</p>
+            <span class="card-link">View User Report &rarr;</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

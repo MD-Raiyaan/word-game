@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Guess the Word{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Roboto+Mono:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('auth.index') }}" class="brand-logo">
+                <span class="logo-tile">W</span>
+                <span class="logo-tile tile-green">O</span>
+                <span class="logo-tile tile-orange">R</span>
+                <span class="logo-tile">D</span>
+            </a>
+            <div class="nav-links">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="nav-link">Dashboard</a>
+                        <a href="{{ url_for('admin.daily_report') }}" class="nav-link">Daily Report</a>
+                        <a href="{{ url_for('admin.user_report') }}" class="nav-link">User Report</a>
+                    {% else %}
+                        <a href="{{ url_for('game.index') }}" class="nav-link">Play Game</a>
+                    {% endif %}
+                    <span class="user-badge {{ 'admin-badge' if current_user.is_admin else 'player-badge' }}">
+                        {{ current_user.username }}
+                    </span>
+                    <a href="{{ url_for('auth.logout') }}" class="btn-logout">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn-primary-sm">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            {% if category not in ['game_won', 'game_lost'] %}
+                                <div class="flash-alert flash-{{ category }}">
+                                    <span>{{ message }}</span>
+                                    <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Guess the Word</p>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

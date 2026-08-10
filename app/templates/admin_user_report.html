@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}User Report - Admin - Guess the Word{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <a href="{{ url_for('admin.dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
+        <h1>User Activity Report</h1>
+        <p class="admin-subtitle">Inspect game history breakdown per player</p>
+    </div>
+
+    <form method="GET" action="{{ url_for('admin.user_report') }}" class="filter-form">
+        <div class="form-inline-group">
+            <label for="userSelect">Select Player:</label>
+            <select id="userSelect" name="user_id" onchange="this.form.submit()">
+                {% for player in players %}
+                    <option value="{{ player.id }}" {% if selected_user and selected_user.id == player.id %}selected{% endif %}>
+                        {{ player.username }}
+                    </option>
+                {% else %}
+                    <option value="">No players registered</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-primary-sm">View Stats</button>
+        </div>
+    </form>
+
+    {% if selected_user %}
+        <div class="user-profile-header">
+            <h3>Player Activity: <strong>{{ selected_user.username }}</strong></h3>
+        </div>
+
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Number of Words Tried (Games Started)</th>
+                    <th>Number of Correct Guesses (Games Won)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in report_rows %}
+                    <tr>
+                        <td><strong>{{ row.date }}</strong></td>
+                        <td>{{ row.words_tried }}</td>
+                        <td><span class="badge-success">{{ row.correct_guesses }}</span></td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-muted text-center">No game activity recorded for this player yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

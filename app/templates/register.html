@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Guess the Word{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <div class="auth-header">
+        <h2>Create Player Account</h2>
+        <p class="auth-subtitle">Sign up to start playing Guess the Word!</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form" id="registerForm" novalidate>
+        <div class="form-group {% if username_error %}has-error{% endif %}">
+            <label for="username">Username</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                value="{{ username or '' }}"
+                required
+                minlength="5"
+                placeholder="e.g. Player$1"
+                autocomplete="off"
+            >
+            {% if username_error %}
+                <span class="field-error-msg" id="usernameError">⚠️ {{ username_error }}</span>
+            {% else %}
+                <span class="field-error-msg" id="usernameError" style="display: none;"></span>
+            {% endif %}
+            <small class="form-hint">Must be at least 5 characters with uppercase (A-Z), lowercase (a-z), and a special character ($ % *).</small>
+        </div>
+
+        <div class="form-group {% if password_error %}has-error{% endif %}">
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                minlength="5"
+                placeholder="e.g. Pass1$"
+            >
+            {% if password_error %}
+                <span class="field-error-msg" id="passwordError">⚠️ {{ password_error }}</span>
+            {% else %}
+                <span class="field-error-msg" id="passwordError" style="display: none;"></span>
+            {% endif %}
+            <small class="form-hint">Must be at least 5 characters with alpha, numeric, and a special character ($ % *).</small>
+        </div>
+
+        <button type="submit" class="btn-submit">Register Account</button>
+    </form>
+
+    <div class="auth-footer">
+        Already have an account? <a href="{{ url_for('auth.login') }}">Log in here</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const usernameErr = document.getElementById('usernameError');
+    const passwordErr = document.getElementById('passwordError');
+
+    function validateUsername(val) {
+        if (!val || val.length < 5) {
+            return "Username must be at least 5 characters long.";
+        }
+        const hasUpper = /[A-Z]/.test(val);
+        const hasLower = /[a-z]/.test(val);
+        const hasSpecial = /[$%*]/.test(val);
+        const missing = [];
+        if (!hasUpper) missing.push("at least one uppercase letter");
+        if (!hasLower) missing.push("at least one lowercase letter");
+        if (!hasSpecial) missing.push("at least one special character from $ % *");
+
+        if (missing.length > 0) {
+            return "Username must contain " + missing.join(", ") + ".";
+        }
+        return "";
+    }
+
+    function validatePassword(val) {
+        if (!val || val.length < 5) {
+            return "Password must be at least 5 characters long.";
+        }
+        const hasAlpha = /[a-zA-Z]/.test(val);
+        const hasDigit = /[0-9]/.test(val);
+        const hasSpecial = /[$%*]/.test(val);
+        const missing = [];
+        if (!hasAlpha) missing.push("at least one letter");
+        if (!hasDigit) missing.push("at least one numeric digit");
+        if (!hasSpecial) missing.push("at least one special character from $ % *");
+
+        if (missing.length > 0) {
+            return "Password must contain " + missing.join(", ") + ".";
+        }
+        return "";
+    }
+
+    usernameInput.addEventListener('input', function() {
+        const err = validateUsername(this.value.trim());
+        if (err) {
+            usernameErr.textContent = "⚠️ " + err;
+            usernameErr.style.display = 'block';
+            this.parentElement.classList.add('has-error');
+        } else {
+            usernameErr.textContent = '';
+            usernameErr.style.display = 'none';
+            this.parentElement.classList.remove('has-error');
+        }
+    });
+
+    passwordInput.addEventListener('input', function() {
+        const err = validatePassword(this.value);
+        if (err) {
+            passwordErr.textContent = "⚠️ " + err;
+            passwordErr.style.display = 'block';
+            this.parentElement.classList.add('has-error');
+        } else {
+            passwordErr.textContent = '';
+            passwordErr.style.display = 'none';
+            this.parentElement.classList.remove('has-error');
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        const uErr = validateUsername(usernameInput.value.trim());
+        const pErr = validatePassword(passwordInput.value);
+        let valid = true;
+
+        if (uErr) {
+            usernameErr.textContent = "⚠️ " + uErr;
+            usernameErr.style.display = 'block';
+            usernameInput.parentElement.classList.add('has-error');
+            valid = false;
+        }
+
+        if (pErr) {
+            passwordErr.textContent = "⚠️ " + pErr;
+            passwordErr.style.display = 'block';
+            passwordInput.parentElement.classList.add('has-error');
+            valid = false;
+        }
+
+        if (!valid) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

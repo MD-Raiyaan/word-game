@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Play - Guess the Word{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="game-header">
+        <h1>Guess the Word</h1>
+        <div class="stats-bar">
+            <span class="stat-item">Daily Limit: <strong>{{ today_count }}/3</strong> games played</span>
+            {% if game %}
+                <span class="stat-item">Attempt: <strong>{{ guesses|length }}/5</strong></span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Win/Loss Flash Modal Dialog -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category in ['game_won', 'game_lost'] %}
+                    <div class="modal-overlay" id="gameResultModal">
+                        <div class="modal-card modal-{{ category }}">
+                            <div class="modal-icon">
+                                {% if category == 'game_won' %}🏆{% else %}💔{% endif %}
+                            </div>
+                            <h2>{% if category == 'game_won' %}Congratulations!{% else %}Game Over{% endif %}</h2>
+                            <p class="modal-message">{{ message }}</p>
+                            <a href="{{ url_for('game.index') }}" class="btn-modal-ok">OK</a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if daily_limit_reached %}
+        <div class="limit-card">
+            <div class="limit-icon">🛑</div>
+            <h2>Daily Limit Reached</h2>
+            <p>You've reached your daily limit of 3 games. Come back tomorrow.</p>
+        </div>
+    {% elif not game and not last_game %}
+        <div class="start-game-card">
+            <h2>Ready to play?</h2>
+            <p>You have 5 attempts to guess the secret 5-letter word.</p>
+            <form method="POST" action="{{ url_for('game.new_game') }}">
+                <button type="submit" class="btn-primary-lg">Start New Game</button>
+            </form>
+        </div>
+    {% elif not game and last_game %}
+        <div class="start-game-card">
+            <h2>Game Completed</h2>
+            <p>Outcome: <strong class="{{ 'text-success' if last_game.status == 'WON' else 'text-danger' }}">{{ last_game.status }}</strong></p>
+            {% if today_count < 3 %}
+                <form method="POST" action="{{ url_for('game.new_game') }}">
+                    <button type="submit" class="btn-primary-lg">Start New Game ({{ today_count }}/3)</button>
+                </form>
+            {% else %}
+                <p class="text-warning">You've reached your daily limit of 3 games. Come back tomorrow.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Wordle Grid (5 rows of 5 tiles) -->
+    <div class="wordle-board">
+        {% for row_idx in range(5) %}
+            <div class="board-row">
+                {% if row_idx < guesses|length %}
+                    {% set guess_info = guesses[row_idx] %}
+                    {% for col_idx in range(5) %}
+                        {% set letter = guess_info.word[col_idx] %}
+                        {% set result = guess_info.results[col_idx] %}
+                        <div class="tile tile-filled tile-{{ result.lower() }}">
+                            {{ letter }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% for col_idx in range(5) %}
+                        <div class="tile tile-empty"></div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Active Input Form (only if active game IN_PROGRESS and guesses < 5) -->
+    {% if game and game.status == 'IN_PROGRESS' and guesses|length < 5 %}
+        <form method="POST" action="{{ url_for('game.submit_guess') }}" class="guess-form" autocomplete="off">
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    name="guess"
+                    id="guessInput"
+                    maxlength="5"
+                    minlength="5"
+                    pattern="[A-Za-z]{5}"
+                    required
+                    placeholder="ENTER 5-LETTER WORD"
+                    autofocus
+                    style="text-transform: uppercase;"
+                    oninput="this.value = this.value.toUpperCase();"
+                >
+                <button type="submit" class="btn-guess">Submit Guess</button>
+            </div>
+            <small class="form-hint">Type a 5-letter uppercase word and submit.</small>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
