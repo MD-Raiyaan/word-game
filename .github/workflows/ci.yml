@@ -1,14 +1,11 @@
-name: CI Pipeline
+name: CI 
 
 on:
   push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
 
 jobs:
   test:
-    name: Build & Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -16,25 +13,26 @@ jobs:
         python-version: ["3.11", "3.12", "3.13"]
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Seed Scripts
-        run: |
-          python seed/seed_words.py
-          python seed/seed_admin.py
+      - name: Seed words
+        run: python seed/seed_words.py
 
-      - name: Run Test Suite
-        run: |
-          pytest
+      - name: Seed admin
+        run: python seed/seed_admin.py
+
+      - name: Run tests
+        env:
+          PYTHONPATH: .
+        run: pytest
