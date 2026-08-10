@@ -204,22 +204,6 @@ Role-based decorators prevent unauthorized users from accessing administrator fu
 
 ---
 
-## Input Validation
-
-The application validates user input before processing it.
-
-Validation includes:
-
-* Username requirements
-* Password requirements
-* 5-letter word guesses
-* Uppercase guess input
-* Maximum of 5 guesses per game
-* Maximum of 3 games per calendar day
-* Valid game state before accepting a guess
-
----
-
 ## Admin Reports
 
 Administrators have access to two types of reports.
