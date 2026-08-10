@@ -32,8 +32,8 @@ jobs:
 
       - name: Run Seed Scripts
         run: |
-          python seed_words.py
-          python seed_admin.py
+          python seed/seed_words.py
+          python seed/seed_admin.py
 
       - name: Run Test Suite
         run: |
